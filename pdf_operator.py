@@ -88,6 +88,13 @@ class MyWindow(QMainWindow):
         self.mergeButton.setText("Merge the documents \n in the list into one pdf")
         self.mergeButton.clicked.connect(self.clickedmergefiles)
 
+        # label that shows up when the merge was done successfully
+        self.successfulMerge = QtWidgets.QLabel(self)
+        self.successfulMerge.setGeometry(QtCore.QRect(50, 763, 700, 50))
+        self.successfulMerge.setObjectName("successfulMergeText")
+        self.successfulMerge.setAlignment(QtCore.Qt.AlignHCenter)
+        self.successfulMerge.setText("")
+
     # method that is called when the button to select files is clicked
     # the paths to all the files are shown in the list view
     def clickedfindfiles(self):
@@ -96,20 +103,21 @@ class MyWindow(QMainWindow):
             fileitem = QStandardItem(filename)
             self.model.appendRow(fileitem)
         self.listoffiles.setModel(self.model)
+        self.successfulMerge.setText("")
 
     def clickeddeletefiles(self):
         self.model.removeRow(self.listoffiles.selectedIndexes()[0].row())
+        self.successfulMerge.setText("")
 
     def clickedselectdirectory(self):
         self.selectedDirectory = str(QFileDialog.getExistingDirectory())
         self.selectedDirectoryText.setText("Selected directory: " + self.selectedDirectory)
+        self.successfulMerge.setText("")
 
     def clickedmergefiles(self):
         pdfs = []
         for row in range(self.model.rowCount()):
             pdfs.append(self.model.item(row).text())
-
-        print(pdfs)
 
         destination_path = self.selectedDirectory + "/" + self.newFileName.text()
 
@@ -122,6 +130,7 @@ class MyWindow(QMainWindow):
                 merger.append(open(pdf, 'rb'))
             with open(destination_path, 'wb') as fout:
                 merger.write(fout)
+            self.successfulMerge.setText("Finished successfully")
         except Exception as e:
             print(e)
 
